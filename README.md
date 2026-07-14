@@ -1,0 +1,91 @@
+# Daniel Cole Personal Site
+
+Static v0 rebuild of `danielcole.design`, designed for GitHub Pages.
+
+## File Structure
+
+```text
+/
+├── index.html
+├── styles.css
+├── script.js
+├── CNAME
+├── README.md
+└── assets/
+    ├── right-column-chunky-pixels.jpg
+    ├── right-column-chunky-pixels.png
+    ├── right-column-pixel-painting.jpg
+    └── right-column-pixel-painting.png
+```
+
+## Update Placeholders
+
+Replace the placeholder links in `index.html` before launch:
+
+- Resume: `https://example.com/resume`
+- Work sample: `https://example.com/work-sample`
+- Writing: `https://example.com/how-to-use-archetypes-in-design`
+- Email: `hello@example.com`
+- LinkedIn: `https://example.com/linkedin`
+- Medium: `https://example.com/medium`
+- Are.na: `https://example.com/arena`
+
+## Type Experiments
+
+The current typography is the `stronger` preset on the root HTML element:
+
+```html
+<html lang="en" data-type="stronger">
+```
+
+To try a different preset, change `data-type` in `index.html` to one of:
+
+- `default`
+- `upright-headline`
+- `quiet`
+- `stronger`
+
+To roll back, change it back to `default`. The preset values live near the top
+of `styles.css` under `Type experiments`.
+
+## GitHub Pages Setup
+
+1. Create a GitHub repository for the site, for example `personalsite`.
+2. Commit and push these files to the repository's default branch.
+3. In GitHub, open **Settings > Pages**.
+4. Set **Build and deployment** to deploy from the default branch root.
+5. Confirm the site works first at the default GitHub Pages URL:
+   `https://YOUR-USERNAME.github.io/personalsite/`
+6. In **Settings > Pages > Custom domain**, enter `danielcole.design`.
+7. Keep **Enforce HTTPS** enabled once GitHub allows it.
+
+## DNS Records
+
+For an apex domain such as `danielcole.design`, GitHub Pages recommends four
+`A` records pointing at GitHub Pages:
+
+```text
+185.199.108.153
+185.199.109.153
+185.199.110.153
+185.199.111.153
+```
+
+If you also want `www.danielcole.design`, add a `CNAME` record:
+
+```text
+www -> YOUR-USERNAME.github.io
+```
+
+GitHub Pages can then redirect the `www` hostname to the apex domain if
+`danielcole.design` remains the custom domain in Pages settings.
+
+## Recommended Migration Order
+
+1. Build and test the site locally.
+2. Push to GitHub and test on the default `*.github.io` URL.
+3. Configure the custom domain in GitHub Pages.
+4. Add or update DNS records at the domain registrar.
+5. Wait for GitHub Pages to verify the domain and issue the HTTPS certificate.
+6. Enable **Enforce HTTPS**.
+7. Keep the current Persona site live until the DNS switch has propagated.
