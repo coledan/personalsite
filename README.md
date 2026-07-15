@@ -18,17 +18,17 @@ Static v0 rebuild of `danielcole.design`, designed for GitHub Pages.
     └── right-column-pixel-painting.png
 ```
 
-## Update Placeholders
+## Live Links
 
-Replace the placeholder links in `index.html` before launch:
+The site currently links to:
 
-- Resume: `https://example.com/resume`
-- Work sample: `https://example.com/work-sample`
-- Writing: `https://example.com/how-to-use-archetypes-in-design`
-- Email: `hello@example.com`
-- LinkedIn: `https://example.com/linkedin`
-- Medium: `https://example.com/medium`
-- Are.na: `https://example.com/arena`
+- Resume: `https://drive.google.com/file/d/17N7e9mnLSyoye_IyOFVtPxUvAcp3EFg_/view?usp=sharing`
+- Work sample: `https://drive.google.com/file/d/1Ql3j-zaH3bPBP2WYCVeoxsH0862dE7I4/view?usp=drive_link`
+- Writing: `https://medium.com/macmillan-design/how-to-use-archetypes-in-design-a7a0d52e695a`
+- Email: `coledan@gmail.com`
+- LinkedIn: `https://www.linkedin.com/in/danielraycole/`
+- Medium: `https://medium.com/@danielraycole`
+- Are.na: `https://www.are.na/daniel-cole`
 
 ## Type Experiments
 
