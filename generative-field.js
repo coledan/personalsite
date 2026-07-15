@@ -2,13 +2,13 @@
   const config = {
     canvasId: 'generative-field',
     seed: 'danielcole',
-    cellSize: 5,
+    cellSize: 4,
     bayerSize: 4,
     fpsCap: 20,
-    objectScale: 0.54,
+    objectScale: 0.64,
     centerX: 0.5,
     centerY: 0.48,
-    viewRadius: 1.5,
+    viewRadius: 1.45,
     boundingRadius: 1.62,
     cameraDistance: 3.2,
     maxRayDistance: 6.2,
@@ -21,18 +21,21 @@
     tiltX: -0.28,
     tiltZ: 0.08,
     lightDirection: [-0.36, 0.48, 0.8],
-    baseInkDensity: 0.34,
-    shadowInkDensity: 0.38,
-    rimInkDensity: 0.3,
+    baseInkDensity: 0.3,
+    shadowInkDensity: 0.48,
+    rimInkDensity: 0.36,
     rimPower: 2.2,
+    toneThresholds: [0.28, 0.48, 0.68],
+    toneCoverages: [0, 0.28, 0.56, 1],
     backgroundColor: '#dce7f2',
     inkColor: '#0e1a2a',
     shapeSets: [
-      ['sphere', 'roundedBox', 'cylinder', 'cone', 'torus', 'roundedBox'],
-      ['roundedBox', 'torus', 'sphere', 'cone', 'cylinder', 'sphere'],
-      ['cylinder', 'sphere', 'torus', 'cone', 'roundedBox', 'sphere'],
+      ['torus', 'sphere', 'roundedBox', 'cylinder', 'cone', 'torus'],
+      ['roundedBox', 'torus', 'sphere', 'cone', 'cylinder', 'roundedBox'],
+      ['cylinder', 'sphere', 'torus', 'cone', 'roundedBox', 'cylinder'],
     ],
     sequenceSet: 0,
+    sequenceOffset: 0,
   };
 
   const canvas = document.getElementById(config.canvasId);
@@ -203,9 +206,9 @@
           continue;
         }
 
-        const threshold = bayerThreshold(col, row);
+        const tone = twoBitTone(hit.density);
 
-        if (hit.density > threshold) {
+        if (shouldDrawTone(tone, col, row)) {
           context.fillRect(
             Math.floor(col * cellSize),
             Math.floor(row * cellSize),
@@ -343,6 +346,38 @@
     return matrix[(row % size) * size + (col % size)];
   }
 
+  function twoBitTone(density) {
+    const thresholds = config.toneThresholds;
+
+    if (density < thresholds[0]) {
+      return 0;
+    }
+
+    if (density < thresholds[1]) {
+      return 1;
+    }
+
+    if (density < thresholds[2]) {
+      return 2;
+    }
+
+    return 3;
+  }
+
+  function shouldDrawTone(tone, col, row) {
+    if (tone <= 0) {
+      return false;
+    }
+
+    const coverage = config.toneCoverages[tone];
+
+    if (coverage >= 1) {
+      return true;
+    }
+
+    return bayerThreshold(col, row) < coverage;
+  }
+
   function sdRoundedBox(point, halfSize, radius) {
     const q = [
       Math.abs(point[0]) - halfSize[0],
@@ -419,7 +454,9 @@
       ? config.sequenceSet % sets.length
       : hashString(config.seed) % sets.length;
     const chosenSet = sets[setIndex];
-    const offset = hashString(`${config.seed}-${setIndex}`) % chosenSet.length;
+    const offset = Number.isInteger(config.sequenceOffset)
+      ? config.sequenceOffset % chosenSet.length
+      : hashString(`${config.seed}-${setIndex}`) % chosenSet.length;
 
     return chosenSet.slice(offset).concat(chosenSet.slice(0, offset));
   }

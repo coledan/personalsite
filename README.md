@@ -68,6 +68,8 @@ of that file, including:
 - `baseInkDensity`
 - `shadowInkDensity`
 - `rimInkDensity`
+- `toneThresholds`
+- `toneCoverages`
 - `backgroundColor`
 - `inkColor`
 
