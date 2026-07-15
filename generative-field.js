@@ -2,37 +2,40 @@
   const config = {
     canvasId: 'generative-field',
     seed: 'danielcole',
-    cellSize: 4,
+    cellSize: 6,
     bayerSize: 4,
     fpsCap: 20,
-    objectScale: 0.64,
+    objectScale: 0.96,
     centerX: 0.5,
-    centerY: 0.48,
-    viewRadius: 1.45,
-    boundingRadius: 1.62,
+    centerY: 0.5,
+    viewRadius: 1.02,
+    boundingRadius: 1.46,
     cameraDistance: 3.2,
     maxRayDistance: 6.2,
     maxRaySteps: 54,
     surfaceEpsilon: 0.012,
     normalEpsilon: 0.025,
-    holdDuration: 7200,
-    morphDuration: 9600,
-    rotationSpeed: 0.000038,
-    tiltX: -0.28,
-    tiltZ: 0.08,
-    lightDirection: [-0.36, 0.48, 0.8],
-    baseInkDensity: 0.3,
-    shadowInkDensity: 0.48,
-    rimInkDensity: 0.36,
-    rimPower: 2.2,
-    toneThresholds: [0.28, 0.48, 0.68],
-    toneCoverages: [0, 0.28, 0.56, 1],
+    holdDuration: 14000,
+    morphDuration: 3600,
+    rotationSpeed: 0.000018,
+    tiltX: -0.08,
+    tiltY: 0.1,
+    tiltZ: 0.04,
+    wobbleAmount: 0.06,
+    wobbleSpeed: 0.000016,
+    lightDirection: [-0.22, 0.52, 0.82],
+    baseInkDensity: 0.36,
+    shadowInkDensity: 0.5,
+    rimInkDensity: 0.44,
+    rimPower: 2,
+    toneThresholds: [0.24, 0.42, 0.62],
+    toneCoverages: [0, 0.33, 0.64, 1],
     backgroundColor: '#dce7f2',
     inkColor: '#0e1a2a',
     shapeSets: [
-      ['torus', 'sphere', 'roundedBox', 'cylinder', 'cone', 'torus'],
-      ['roundedBox', 'torus', 'sphere', 'cone', 'cylinder', 'roundedBox'],
-      ['cylinder', 'sphere', 'torus', 'cone', 'roundedBox', 'cylinder'],
+      ['torus', 'torus', 'torusWide', 'torus', 'torusNarrow', 'torus', 'cone'],
+      ['torus', 'torusWide', 'torus', 'sphere', 'torus', 'roundedBox', 'cone'],
+      ['torus', 'torusNarrow', 'torus', 'cylinder', 'torus', 'roundedBox', 'cone'],
     ],
     sequenceSet: 0,
     sequenceOffset: 0,
@@ -277,6 +280,14 @@
       return sdCappedCone(point, 0.72, 0.18, 1.32);
     }
 
+    if (shape === 'torusWide') {
+      return sdTorus(point, 0.56, 0.25);
+    }
+
+    if (shape === 'torusNarrow') {
+      return sdTorus(point, 0.62, 0.18);
+    }
+
     return sdTorus(point, 0.58, 0.22);
   }
 
@@ -304,12 +315,15 @@
   }
 
   function rotationState(time) {
-    const base = state.reduceMotion ? 0.82 : time * config.rotationSpeed + 0.82;
+    const turn = state.reduceMotion ? 0.16 : time * config.rotationSpeed + 0.16;
+    const wobble = state.reduceMotion
+      ? 0
+      : Math.sin(time * config.wobbleSpeed) * config.wobbleAmount;
 
     return {
       x: config.tiltX,
-      y: base,
-      z: config.tiltZ,
+      y: config.tiltY + wobble,
+      z: config.tiltZ + turn,
     };
   }
 
@@ -402,7 +416,7 @@
   }
 
   function sdTorus(point, majorRadius, minorRadius) {
-    const q = [Math.hypot(point[0], point[2]) - majorRadius, point[1]];
+    const q = [Math.hypot(point[0], point[1]) - majorRadius, point[2]];
     return length2(q) - minorRadius;
   }
 

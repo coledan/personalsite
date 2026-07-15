@@ -64,6 +64,11 @@ of that file, including:
 - `holdDuration`
 - `morphDuration`
 - `rotationSpeed`
+- `tiltX`
+- `tiltY`
+- `tiltZ`
+- `wobbleAmount`
+- `wobbleSpeed`
 - `bayerSize`
 - `baseInkDensity`
 - `shadowInkDensity`
