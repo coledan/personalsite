@@ -2,13 +2,13 @@
   const config = {
     canvasId: 'generative-field',
     seed: 'danielcole',
-    cellSize: 7,
+    cellSize: 5,
     bayerSize: 4,
     fpsCap: 20,
-    objectScale: 0.45,
+    objectScale: 0.54,
     centerX: 0.5,
     centerY: 0.48,
-    viewRadius: 1.75,
+    viewRadius: 1.5,
     boundingRadius: 1.62,
     cameraDistance: 3.2,
     maxRayDistance: 6.2,
@@ -21,6 +21,10 @@
     tiltX: -0.28,
     tiltZ: 0.08,
     lightDirection: [-0.36, 0.48, 0.8],
+    baseInkDensity: 0.34,
+    shadowInkDensity: 0.38,
+    rimInkDensity: 0.3,
+    rimPower: 2.2,
     backgroundColor: '#dce7f2',
     inkColor: '#0e1a2a',
     shapeSets: [
@@ -321,8 +325,16 @@
   function shadeDensity(normal) {
     const light = normalize3(config.lightDirection);
     const diffuse = Math.max(0, dot3(normal, light));
-    const brightness = clamp(0.22 + diffuse * 0.72, 0, 1);
-    return clamp(0.12 + (1 - brightness) * 0.82, 0.06, 0.88);
+    const shadow = 1 - diffuse;
+    const viewFacing = clamp(normal[2], 0, 1);
+    const rim = Math.pow(1 - viewFacing, config.rimPower);
+    return clamp(
+      config.baseInkDensity
+        + shadow * config.shadowInkDensity
+        + rim * config.rimInkDensity,
+      0.22,
+      0.94
+    );
   }
 
   function bayerThreshold(col, row) {

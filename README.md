@@ -65,6 +65,9 @@ of that file, including:
 - `morphDuration`
 - `rotationSpeed`
 - `bayerSize`
+- `baseInkDensity`
+- `shadowInkDensity`
+- `rimInkDensity`
 - `backgroundColor`
 - `inkColor`
 
