@@ -9,6 +9,7 @@ Static v0 rebuild of `danielcole.design`, designed for GitHub Pages.
 ├── index.html
 ├── styles.css
 ├── script.js
+├── generative-field.js
 ├── CNAME
 ├── README.md
 └── assets/
@@ -17,6 +18,9 @@ Static v0 rebuild of `danielcole.design`, designed for GitHub Pages.
     ├── right-column-pixel-painting.jpg
     └── right-column-pixel-painting.png
 ```
+
+The right column currently renders from `generative-field.js`. The image files
+in `assets/` are retained as previous placeholder explorations.
 
 ## Live Links
 
@@ -47,6 +51,22 @@ To try a different preset, change `data-type` in `index.html` to one of:
 
 To roll back, change it back to `default`. The preset values live near the top
 of `styles.css` under `Type experiments`.
+
+## Generative Field
+
+The right column is a decorative, deterministic canvas rendered by
+`generative-field.js`. Tunable values live in the `config` object near the top
+of that file, including:
+
+- `cellSize`
+- `objectScale`
+- `shapeSets`
+- `holdDuration`
+- `morphDuration`
+- `rotationSpeed`
+- `bayerSize`
+- `backgroundColor`
+- `inkColor`
 
 ## GitHub Pages Setup
 

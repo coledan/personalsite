@@ -23,6 +23,9 @@
   --color-text-muted: rgba(14, 26, 42, 0.9);
   --color-link-underline: rgba(75, 107, 130, 0.22);
   --color-focus: #304f78;
+  --field-background: #dce7f2;
+  --field-ink: #0e1a2a;
+  --field-column-padding: clamp(2.2rem, 5.6vw, 5.4rem);
   --content-padding-block: clamp(2.07rem, 5.4vh, 3.69rem);
   --content-padding-inline: clamp(1.8rem, 3.42vw, 2.88rem);
   --content-item-gap: 0.42rem;
@@ -176,20 +179,21 @@ a:focus-visible {
   outline-offset: 0.22rem;
 }
 
-.image-column {
+.field-column {
+  display: grid;
   min-height: 100vh;
+  padding: var(--field-column-padding);
+  background: var(--field-background);
   overflow: hidden;
+  place-items: stretch;
 }
 
-.image-column picture,
-.image-column img {
+.generative-field-canvas {
   display: block;
   width: 100%;
   height: 100%;
-}
-
-.image-column img {
-  object-fit: cover;
+  background: var(--field-background);
+  image-rendering: pixelated;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -216,7 +220,7 @@ a:focus-visible {
     padding: clamp(1.125rem, 5.4vw, 2.34rem);
   }
 
-  .image-column {
+  .field-column {
     display: none;
   }
 

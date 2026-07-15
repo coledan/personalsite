@@ -16,6 +16,7 @@
     >
     <link rel="stylesheet" href="styles.css">
     <script src="script.js" defer></script>
+    <script src="generative-field.js" defer></script>
   </head>
   <body>
     <main class="site-shell" aria-label="Daniel Cole personal site">
@@ -109,17 +110,11 @@
         </nav>
       </div>
 
-      <aside class="image-column" aria-label="Pixelated abstract image">
-        <picture>
-          <source
-            media="(min-width: 900px)"
-            srcset="assets/right-column-chunky-pixels.jpg"
-          >
-          <img
-            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E"
-            alt="Pixelated abstract painting in pale blue and dark navy tones"
-          >
-        </picture>
+      <aside class="field-column" aria-hidden="true">
+        <canvas
+          class="generative-field-canvas"
+          id="generative-field"
+        ></canvas>
       </aside>
     </main>
   </body>
