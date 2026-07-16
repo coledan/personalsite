@@ -35,7 +35,7 @@
     toneThresholds: [0.24, 0.42, 0.62],
     toneCoverages: [0, 0.33, 0.64, 1],
     backgroundColor: '#dce7f2',
-    inkColor: '#0e1a2a',
+    inkColor: '#1f2e3d',
   };
 
   const canvas = document.getElementById(config.canvasId);
