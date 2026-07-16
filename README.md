@@ -56,19 +56,19 @@ of `styles.css` under `Type experiments`.
 
 The right column is a decorative canvas rendered by `generative-field.js`. On
 load, it chooses one primitive from the configured shape options and gives that
-single object a subtle 3D pivot. Tunable values live in the `config` object near
-the top of that file, including:
+single object a full 3D rotation. Tunable values live in the `config` object
+near the top of that file, including:
 
 - `cellSize`
 - `objectScale`
 - `selectedShape`
 - `shapeOptions`
-- `rotationSpeed`
+- `rotationSpeedX`
+- `rotationSpeedY`
+- `rotationSpeedZ`
 - `tiltX`
 - `tiltY`
 - `tiltZ`
-- `pivotAmount`
-- `pivotSpeed`
 - `bayerSize`
 - `baseInkDensity`
 - `shadowInkDensity`

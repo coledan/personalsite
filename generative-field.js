@@ -16,13 +16,13 @@
     surfaceEpsilon: 0.012,
     normalEpsilon: 0.025,
     selectedShape: 'auto',
-    shapeOptions: ['torus', 'torusWide', 'torusNarrow'],
-    rotationSpeed: 0.00001,
-    tiltX: -0.08,
-    tiltY: 0.1,
-    tiltZ: 0.04,
-    pivotAmount: 0.16,
-    pivotSpeed: 0.00038,
+    shapeOptions: ['torus', 'box', 'sphere', 'cylinder', 'cone'],
+    rotationSpeedX: 0.000115,
+    rotationSpeedY: 0.000157,
+    rotationSpeedZ: 0.000073,
+    tiltX: -0.42,
+    tiltY: 0.34,
+    tiltZ: 0.18,
     lightDirection: [-0.22, 0.52, 0.82],
     baseInkDensity: 0.36,
     shadowInkDensity: 0.5,
@@ -76,7 +76,9 @@
     pausedTotal: 0,
     reduceMotion: reduceMotionQuery.matches,
     selectedShape: chooseShape(),
-    motionPhase: randomUnit() * Math.PI * 2,
+    rotationPhaseX: randomUnit() * Math.PI * 2,
+    rotationPhaseY: randomUnit() * Math.PI * 2,
+    rotationPhaseZ: randomUnit() * Math.PI * 2,
   };
 
   if ('IntersectionObserver' in window) {
@@ -267,8 +269,8 @@
       return length3(point) - 0.92;
     }
 
-    if (shape === 'roundedBox') {
-      return sdRoundedBox(point, [0.68, 0.68, 0.68], 0.16);
+    if (shape === 'box' || shape === 'roundedBox') {
+      return sdRoundedBox(point, [0.72, 0.58, 0.82], 0.12);
     }
 
     if (shape === 'cylinder') {
@@ -291,15 +293,12 @@
   }
 
   function rotationState(time) {
-    const phase = state.reduceMotion ? 0 : time * config.pivotSpeed + state.motionPhase;
-    const turn = state.reduceMotion ? 0.16 : time * config.rotationSpeed + 0.16;
-    const pivotX = Math.sin(phase) * config.pivotAmount;
-    const pivotY = Math.cos(phase * 0.82) * config.pivotAmount;
+    const activeTime = state.reduceMotion ? 0 : time;
 
     return {
-      x: config.tiltX + pivotX,
-      y: config.tiltY + pivotY,
-      z: config.tiltZ + turn,
+      x: config.tiltX + state.rotationPhaseX + activeTime * config.rotationSpeedX,
+      y: config.tiltY + state.rotationPhaseY + activeTime * config.rotationSpeedY,
+      z: config.tiltZ + state.rotationPhaseZ + activeTime * config.rotationSpeedZ,
     };
   }
 
