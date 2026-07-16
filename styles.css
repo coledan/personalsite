@@ -236,6 +236,7 @@ a:focus-visible {
     max-width: 14em;
     font-size: var(--type-headline-mobile-size);
     line-height: var(--type-headline-mobile-line);
+    min-height: 2.32em;
   }
 
   .link-section ul {
