@@ -277,7 +277,7 @@
     }
 
     if (shape === 'box' || shape === 'roundedBox') {
-      return sdRoundedBox(point, [0.72, 0.58, 0.82], 0.12);
+      return sdRoundedBox(point, [0.56, 0.46, 0.62], 0.1);
     }
 
     if (shape === 'cylinder') {
