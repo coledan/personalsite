@@ -69,6 +69,10 @@ near the top of that file, including:
 - `tiltX`
 - `tiltY`
 - `tiltZ`
+- `lightOrbitAmount`
+- `lightOrbitSpeed`
+- `sphereLightOrbitAmount`
+- `sphereLightOrbitSpeed`
 - `bayerSize`
 - `baseInkDensity`
 - `shadowInkDensity`

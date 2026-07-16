@@ -24,6 +24,10 @@
     tiltY: 0.34,
     tiltZ: 0.18,
     lightDirection: [-0.22, 0.52, 0.82],
+    lightOrbitAmount: 0.14,
+    lightOrbitSpeed: 0.00008,
+    sphereLightOrbitAmount: 0.68,
+    sphereLightOrbitSpeed: 0.00018,
     baseInkDensity: 0.36,
     shadowInkDensity: 0.5,
     rimInkDensity: 0.44,
@@ -79,6 +83,7 @@
     rotationPhaseX: randomUnit() * Math.PI * 2,
     rotationPhaseY: randomUnit() * Math.PI * 2,
     rotationPhaseZ: randomUnit() * Math.PI * 2,
+    lightPhase: randomUnit() * Math.PI * 2,
   };
 
   if ('IntersectionObserver' in window) {
@@ -189,6 +194,7 @@
     const startRow = Math.max(0, Math.floor((centerY - radiusPx) / cellSize) - 1);
     const endRow = Math.min(Math.ceil(height / cellSize), Math.ceil((centerY + radiusPx) / cellSize) + 1);
     const rotation = rotationState(time);
+    const light = lightState(time);
 
     context.fillStyle = background;
     context.fillRect(0, 0, width, height);
@@ -205,7 +211,8 @@
           centerY,
           objectSize,
           state.selectedShape,
-          rotation
+          rotation,
+          light
         );
 
         if (!hit.hit) {
@@ -226,7 +233,7 @@
     }
   }
 
-  function raymarch(sampleX, sampleY, centerX, centerY, objectSize, shape, rotation) {
+  function raymarch(sampleX, sampleY, centerX, centerY, objectSize, shape, rotation, light) {
     const x = ((sampleX - centerX) / (objectSize * 0.5)) * config.viewRadius;
     const y = (-(sampleY - centerY) / (objectSize * 0.5)) * config.viewRadius;
     const radiusSquared = config.boundingRadius * config.boundingRadius;
@@ -245,7 +252,7 @@
 
       if (distance < config.surfaceEpsilon) {
         const normal = estimateNormal(point, shape, rotation);
-        const density = shadeDensity(normal);
+        const density = shadeDensity(normal, light);
         return { hit: true, density };
       }
 
@@ -302,6 +309,25 @@
     };
   }
 
+  function lightState(time) {
+    const base = normalize3(config.lightDirection);
+
+    if (state.reduceMotion) {
+      return base;
+    }
+
+    const isSphere = state.selectedShape === 'sphere';
+    const amount = isSphere ? config.sphereLightOrbitAmount : config.lightOrbitAmount;
+    const speed = isSphere ? config.sphereLightOrbitSpeed : config.lightOrbitSpeed;
+    const phase = time * speed + state.lightPhase;
+
+    return normalize3([
+      base[0] + Math.cos(phase) * amount,
+      base[1] + Math.sin(phase * 0.74 + 0.7) * amount * 0.55,
+      base[2] + Math.sin(phase) * amount * 0.35,
+    ]);
+  }
+
   function estimateNormal(point, shape, rotation) {
     const epsilon = config.normalEpsilon;
     const dx = sceneDistance([point[0] + epsilon, point[1], point[2]], shape, rotation)
@@ -314,8 +340,7 @@
     return normalize3([dx, dy, dz]);
   }
 
-  function shadeDensity(normal) {
-    const light = normalize3(config.lightDirection);
+  function shadeDensity(normal, light) {
     const diffuse = Math.max(0, dot3(normal, light));
     const shadow = 1 - diffuse;
     const viewFacing = clamp(normal[2], 0, 1);
