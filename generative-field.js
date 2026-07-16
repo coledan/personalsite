@@ -15,14 +15,14 @@
     maxRaySteps: 54,
     surfaceEpsilon: 0.012,
     normalEpsilon: 0.025,
-    holdDuration: 14000,
-    morphDuration: 3600,
-    rotationSpeed: 0.000018,
+    selectedShape: 'auto',
+    shapeOptions: ['torus', 'torusWide', 'torusNarrow'],
+    rotationSpeed: 0.00001,
     tiltX: -0.08,
     tiltY: 0.1,
     tiltZ: 0.04,
-    wobbleAmount: 0.06,
-    wobbleSpeed: 0.000016,
+    pivotAmount: 0.16,
+    pivotSpeed: 0.00038,
     lightDirection: [-0.22, 0.52, 0.82],
     baseInkDensity: 0.36,
     shadowInkDensity: 0.5,
@@ -32,13 +32,6 @@
     toneCoverages: [0, 0.33, 0.64, 1],
     backgroundColor: '#dce7f2',
     inkColor: '#0e1a2a',
-    shapeSets: [
-      ['torus', 'torus', 'torusWide', 'torus', 'torusNarrow', 'torus', 'cone'],
-      ['torus', 'torusWide', 'torus', 'sphere', 'torus', 'roundedBox', 'cone'],
-      ['torus', 'torusNarrow', 'torus', 'cylinder', 'torus', 'roundedBox', 'cone'],
-    ],
-    sequenceSet: 0,
-    sequenceOffset: 0,
   };
 
   const canvas = document.getElementById(config.canvasId);
@@ -82,7 +75,8 @@
     pausedAt: 0,
     pausedTotal: 0,
     reduceMotion: reduceMotionQuery.matches,
-    sequence: buildSequence(),
+    selectedShape: chooseShape(),
+    motionPhase: randomUnit() * Math.PI * 2,
   };
 
   if ('IntersectionObserver' in window) {
@@ -192,7 +186,6 @@
     const endCol = Math.min(Math.ceil(width / cellSize), Math.ceil((centerX + radiusPx) / cellSize) + 1);
     const startRow = Math.max(0, Math.floor((centerY - radiusPx) / cellSize) - 1);
     const endRow = Math.min(Math.ceil(height / cellSize), Math.ceil((centerY + radiusPx) / cellSize) + 1);
-    const cycle = shapeCycle(time);
     const rotation = rotationState(time);
 
     context.fillStyle = background;
@@ -203,7 +196,15 @@
       for (let col = startCol; col < endCol; col += 1) {
         const sampleX = col * cellSize + cellSize * 0.5;
         const sampleY = row * cellSize + cellSize * 0.5;
-        const hit = raymarch(sampleX, sampleY, centerX, centerY, objectSize, cycle, rotation);
+        const hit = raymarch(
+          sampleX,
+          sampleY,
+          centerX,
+          centerY,
+          objectSize,
+          state.selectedShape,
+          rotation
+        );
 
         if (!hit.hit) {
           continue;
@@ -223,7 +224,7 @@
     }
   }
 
-  function raymarch(sampleX, sampleY, centerX, centerY, objectSize, cycle, rotation) {
+  function raymarch(sampleX, sampleY, centerX, centerY, objectSize, shape, rotation) {
     const x = ((sampleX - centerX) / (objectSize * 0.5)) * config.viewRadius;
     const y = (-(sampleY - centerY) / (objectSize * 0.5)) * config.viewRadius;
     const radiusSquared = config.boundingRadius * config.boundingRadius;
@@ -238,10 +239,10 @@
 
     for (let step = 0; step < config.maxRaySteps; step += 1) {
       const point = [x, y, config.cameraDistance - distanceTraveled];
-      const distance = sceneDistance(point, cycle, rotation);
+      const distance = sceneDistance(point, shape, rotation);
 
       if (distance < config.surfaceEpsilon) {
-        const normal = estimateNormal(point, cycle, rotation);
+        const normal = estimateNormal(point, shape, rotation);
         const density = shadeDensity(normal);
         return { hit: true, density };
       }
@@ -256,11 +257,9 @@
     return { hit: false, density: 0 };
   }
 
-  function sceneDistance(point, cycle, rotation) {
+  function sceneDistance(point, shape, rotation) {
     const localPoint = rotatePoint(point, -rotation.y, -rotation.x, -rotation.z);
-    const distanceA = primitiveDistance(localPoint, cycle.from);
-    const distanceB = primitiveDistance(localPoint, cycle.to);
-    return mix(distanceA, distanceB, cycle.morph);
+    return primitiveDistance(localPoint, shape);
   }
 
   function primitiveDistance(point, shape) {
@@ -291,50 +290,27 @@
     return sdTorus(point, 0.58, 0.22);
   }
 
-  function shapeCycle(time) {
-    if (state.reduceMotion) {
-      return {
-        from: state.sequence[0],
-        to: state.sequence[0],
-        morph: 0,
-      };
-    }
-
-    const cycleDuration = config.holdDuration + config.morphDuration;
-    const cycleIndex = Math.floor(time / cycleDuration) % state.sequence.length;
-    const cycleTime = time % cycleDuration;
-    const from = state.sequence[cycleIndex];
-    const to = state.sequence[(cycleIndex + 1) % state.sequence.length];
-    const rawMorph = Math.max(0, (cycleTime - config.holdDuration) / config.morphDuration);
-
-    return {
-      from,
-      to,
-      morph: smoothstep(0, 1, rawMorph),
-    };
-  }
-
   function rotationState(time) {
+    const phase = state.reduceMotion ? 0 : time * config.pivotSpeed + state.motionPhase;
     const turn = state.reduceMotion ? 0.16 : time * config.rotationSpeed + 0.16;
-    const wobble = state.reduceMotion
-      ? 0
-      : Math.sin(time * config.wobbleSpeed) * config.wobbleAmount;
+    const pivotX = Math.sin(phase) * config.pivotAmount;
+    const pivotY = Math.cos(phase * 0.82) * config.pivotAmount;
 
     return {
-      x: config.tiltX,
-      y: config.tiltY + wobble,
+      x: config.tiltX + pivotX,
+      y: config.tiltY + pivotY,
       z: config.tiltZ + turn,
     };
   }
 
-  function estimateNormal(point, cycle, rotation) {
+  function estimateNormal(point, shape, rotation) {
     const epsilon = config.normalEpsilon;
-    const dx = sceneDistance([point[0] + epsilon, point[1], point[2]], cycle, rotation)
-      - sceneDistance([point[0] - epsilon, point[1], point[2]], cycle, rotation);
-    const dy = sceneDistance([point[0], point[1] + epsilon, point[2]], cycle, rotation)
-      - sceneDistance([point[0], point[1] - epsilon, point[2]], cycle, rotation);
-    const dz = sceneDistance([point[0], point[1], point[2] + epsilon], cycle, rotation)
-      - sceneDistance([point[0], point[1], point[2] - epsilon], cycle, rotation);
+    const dx = sceneDistance([point[0] + epsilon, point[1], point[2]], shape, rotation)
+      - sceneDistance([point[0] - epsilon, point[1], point[2]], shape, rotation);
+    const dy = sceneDistance([point[0], point[1] + epsilon, point[2]], shape, rotation)
+      - sceneDistance([point[0], point[1] - epsilon, point[2]], shape, rotation);
+    const dz = sceneDistance([point[0], point[1], point[2] + epsilon], shape, rotation)
+      - sceneDistance([point[0], point[1], point[2] - epsilon], shape, rotation);
 
     return normalize3([dx, dy, dz]);
   }
@@ -462,19 +438,6 @@
     return [point[0] * c - point[1] * s, point[0] * s + point[1] * c, point[2]];
   }
 
-  function buildSequence() {
-    const sets = config.shapeSets;
-    const setIndex = Number.isInteger(config.sequenceSet)
-      ? config.sequenceSet % sets.length
-      : hashString(config.seed) % sets.length;
-    const chosenSet = sets[setIndex];
-    const offset = Number.isInteger(config.sequenceOffset)
-      ? config.sequenceOffset % chosenSet.length
-      : hashString(`${config.seed}-${setIndex}`) % chosenSet.length;
-
-    return chosenSet.slice(offset).concat(chosenSet.slice(0, offset));
-  }
-
   function readCssColor(name, fallback) {
     const value = window.getComputedStyle(document.documentElement).getPropertyValue(name).trim();
     return value || fallback;
@@ -489,6 +452,33 @@
     };
   }
 
+  function chooseShape() {
+    if (config.selectedShape && config.selectedShape !== 'auto') {
+      return config.selectedShape;
+    }
+
+    const options = config.shapeOptions.filter(Boolean);
+    return options[randomIndex(options.length)] || 'torus';
+  }
+
+  function randomIndex(length) {
+    if (length <= 1) {
+      return 0;
+    }
+
+    return Math.floor(randomUnit() * length) % length;
+  }
+
+  function randomUnit() {
+    if (window.crypto && typeof window.crypto.getRandomValues === 'function') {
+      const values = new Uint32Array(1);
+      window.crypto.getRandomValues(values);
+      return values[0] / 4294967296;
+    }
+
+    return hashString(`${config.seed}-${Date.now()}-${Math.random()}`) / 4294967296;
+  }
+
   function hashString(value) {
     let hash = 2166136261;
 
@@ -498,15 +488,6 @@
     }
 
     return hash >>> 0;
-  }
-
-  function smoothstep(edge0, edge1, value) {
-    const x = clamp((value - edge0) / (edge1 - edge0), 0, 1);
-    return x * x * (3 - 2 * x);
-  }
-
-  function mix(a, b, amount) {
-    return a * (1 - amount) + b * amount;
   }
 
   function clamp(value, min, max) {

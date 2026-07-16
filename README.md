@@ -54,21 +54,21 @@ of `styles.css` under `Type experiments`.
 
 ## Generative Field
 
-The right column is a decorative, deterministic canvas rendered by
-`generative-field.js`. Tunable values live in the `config` object near the top
-of that file, including:
+The right column is a decorative canvas rendered by `generative-field.js`. On
+load, it chooses one primitive from the configured shape options and gives that
+single object a subtle 3D pivot. Tunable values live in the `config` object near
+the top of that file, including:
 
 - `cellSize`
 - `objectScale`
-- `shapeSets`
-- `holdDuration`
-- `morphDuration`
+- `selectedShape`
+- `shapeOptions`
 - `rotationSpeed`
 - `tiltX`
 - `tiltY`
 - `tiltZ`
-- `wobbleAmount`
-- `wobbleSpeed`
+- `pivotAmount`
+- `pivotSpeed`
 - `bayerSize`
 - `baseInkDensity`
 - `shadowInkDensity`
