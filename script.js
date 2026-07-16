@@ -1,7 +1,10 @@
 const headlines = [
-  'Building an EHR intelligence layer.',
-  'Leading UX teams into a new discipline.',
-  'Shipping healthcare product without design tools.',
+  'Building an intelligence layer.',
+  'Leading UX teams into a new frontier of design.',
+  'Grounding AI in human-centered research.',
+  'Researching what matters most.',
+  "Judging what's worth shipping.",
+  'Designing where the stakes are real.',
 ];
 
 const headlineElement = document.querySelector('[data-headline]');
